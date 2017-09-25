@@ -5,10 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
-  SchematicsError,
+  SchematicsException,
   Tree,
   apply,
   branchAndMerge,
@@ -17,7 +18,6 @@ import {
   mergeWith,
   move,
   noop,
-  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -39,7 +39,7 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
     const modulePath = options.module;
     const text = host.read(modulePath);
     if (text === null) {
-      throw new SchematicsError(`File ${modulePath} does not exist.`);
+      throw new SchematicsException(`File ${modulePath} does not exist.`);
     }
     const sourceText = text.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
@@ -63,7 +63,7 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
     if (options.export) {
       const text = host.read(modulePath);
       if (text === null) {
-        throw new SchematicsError(`File ${modulePath} does not exist.`);
+        throw new SchematicsException(`File ${modulePath} does not exist.`);
       }
       const sourceText = text.toString('utf-8');
       const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
@@ -86,10 +86,10 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 }
 
 export default function (options: PipeOptions): Rule {
-  options.path = options.path ? normalizePath(options.path) : options.path;
+  options.path = options.path ? normalize(options.path) : options.path;
   const sourceDir = options.sourceDir;
   if (!sourceDir) {
-    throw new SchematicsError(`sourceDir option is required.`);
+    throw new SchematicsException(`sourceDir option is required.`);
   }
 
   return (host: Tree, context: SchematicContext) => {

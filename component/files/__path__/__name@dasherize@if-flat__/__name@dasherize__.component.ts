@@ -1,4 +1,4 @@
-import { Component<% if(viewEncapsulation !== 'None') { %>, ViewEncapsulation<% }%><% if(changeDetection !== 'Default') { %>, ChangeDetectionStrategy<% }%> } from '@angular/core';
+import { Component, OnInit<% if(viewEncapsulation !== 'None') { %>, ViewEncapsulation<% }%><% if(changeDetection !== 'Default') { %>, ChangeDetectionStrategy<% }%> } from '@angular/core';
 
 @Component({
   selector: '<%= selector %>',<% if(inlineTemplate) { %>
@@ -9,10 +9,15 @@ import { Component<% if(viewEncapsulation !== 'None') { %>, ViewEncapsulation<% 
   `,<% } else { %>
   templateUrl: './<%= dasherize(name) %>.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: [ './<%= dasherize(name) %>.component.<%= styleext %>' ]<% } %><% if(viewEncapsulation !== 'None') { %>,
+  styleUrls: ['./<%= dasherize(name) %>.component.<%= styleext %>']<% } %><% if(viewEncapsulation !== 'None') { %>,
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
 })
-export class <%= classify(name) %>Component {
+export class <%= classify(name) %>Component implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+  }
 
 }

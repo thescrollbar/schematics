@@ -8,7 +8,7 @@
       "root": "<%= sourceDir %>",
       "outDir": "dist",
       "assets": [
-        "static",
+        "assets",
         "favicon.ico"
       ],
       "index": "index.html",
@@ -19,13 +19,8 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "<%= prefix %>",
       "styles": [
-        "styles/app.scss"
+        "styles.<%= style %>"
       ],
-      "stylePreprocessorOptions": {
-        "includePaths": [
-          "styles"
-        ]
-      },
       "scripts": [],
       "environmentSource": "environments/environment.ts",
       "environments": {
@@ -59,7 +54,7 @@
     }
   },
   "defaults": {
-    "styleExt": "scss",<% if (!minimal) { %>
+    "styleExt": "<%= style %>",<% if (!minimal) { %>
     "component": {}<% } else { %>
     "component": {
       "spec": false,

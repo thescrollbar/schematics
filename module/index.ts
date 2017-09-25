@@ -5,10 +5,11 @@
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.io/license
 */
+import { basename, dirname, normalize, relative } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
-  SchematicsError,
+  SchematicsException,
   Tree,
   apply,
   branchAndMerge,
@@ -17,7 +18,6 @@ import {
   mergeWith,
   move,
   noop,
-  normalizePath,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -25,7 +25,7 @@ import * as ts from 'typescript';
 import * as stringUtils from '../strings';
 import { addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { findModuleFromOptions } from '../utility/find-module';
 import { Schema as ModuleOptions } from './schema';
 
 
@@ -35,20 +35,24 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
       return host;
     }
 
-    const modulePath = options.module;
+    const modulePath = normalize('/' + options.module);
 
     const text = host.read(modulePath);
     if (text === null) {
-      throw new SchematicsError(`File ${modulePath} does not exist.`);
+      throw new SchematicsException(`File ${modulePath} does not exist.`);
     }
     const sourceText = text.toString('utf-8');
     const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 
-    const importModulePath = `/${options.sourceDir}/${options.path}/`
-                     + (options.flat ? '' : stringUtils.dasherize(options.name) + '/')
-                     + stringUtils.dasherize(options.name)
-                     + '.module';
-    const relativePath = buildRelativePath(modulePath, importModulePath);
+    const importModulePath = normalize(
+      `/${options.sourceDir}/${options.path}/`
+      + (options.flat ? '' : stringUtils.dasherize(options.name) + '/')
+      + stringUtils.dasherize(options.name)
+      + '.module',
+    );
+    const relativeDir = relative(dirname(modulePath), dirname(importModulePath));
+    const relativePath = (relativeDir.startsWith('.') ? relativeDir : './' + relativeDir)
+      + '/' + basename(importModulePath);
     const changes = addImportToModule(source, modulePath,
                                       stringUtils.classify(`${options.name}Module`),
                                       relativePath);
@@ -66,10 +70,10 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 }
 
 export default function (options: ModuleOptions): Rule {
-  options.path = options.path ? normalizePath(options.path) : options.path;
+  options.path = options.path ? normalize(options.path) : options.path;
   const sourceDir = options.sourceDir;
   if (!sourceDir) {
-    throw new SchematicsError(`sourceDir option is required.`);
+    throw new SchematicsException(`sourceDir option is required.`);
   }
 
   return (host: Tree, context: SchematicContext) => {
