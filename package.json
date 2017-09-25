@@ -1,11 +1,12 @@
 {
   "name": "@thescrollbar/schematics",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Scrollbar.io angular schematics",
   "schematics": "./collection.json",
-  "peerDependencies" :{
+  "peerDependencies": {
     "rxjs": ">5.4.2",
     "@angular-devkit/schematics": "0.0.24",
-    "@schematics/angular": "0.0.36"
+    "@schematics/angular": "0.0.36",
+    "typescript": "2.4.0"
   }
 }
